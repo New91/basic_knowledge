@@ -50,7 +50,7 @@ int main(void)
     }
 
     msg_flags = IPC_CREAT | IPC_EXCL; // IPC_EXCL配合IPC_CREAT使用，保证建立一个新的消息队列，如果不是则报错
-    msg_id = msgget(key, msg_flags | 0x0666);
+    msg_id = msgget(key, msg_flags | 0666);
     if( -1 == msg_id){
         printf("建立msg失败\n");
         return -1;
