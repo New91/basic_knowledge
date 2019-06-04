@@ -91,6 +91,7 @@ int main(void)
         printf("设置消息成功\n");
     msg_show_atrr(msg_id, msg_info);
 
+    sleep(10);
     ret = msgctl(msg_id, IPC_RMID, NULL);
     if( -1 == ret){
         printf("删除消息失败\n");
