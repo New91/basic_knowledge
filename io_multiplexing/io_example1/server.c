@@ -55,7 +55,22 @@ void process_conn_server(int s)
     ssize_t size = 0;
 
     struct iovec *v = (struct iovec*)malloc(3*sizeof(struct iovec));
+    if(!v){
+        printf("not enough memory\n");
+        return ;
+    }
     vs = v; //挂接全局变量，便于释放
+
+    //初始化消息
+    struct msghdr msg;
+    msg.msg_name = NULL;
+    msg.msg_namelen = 0;
+    msg.msg_control = NULL;
+    msg.msg_controllen = 0;
+    msg.msg_iov = v;
+    msg.msg_iovlen = 30;
+    msg.msg_flags = 0;
+
     v[0].iov_base = buffer;
     v[1].iov_base = buffer + 10;
     v[2].iov_base = buffer + 20;
@@ -63,20 +78,24 @@ void process_conn_server(int s)
 
     while(1)
     {
+        //memset(v,0, sizeof(struct iovec));
         // 从套接字中读取数据放到向量缓冲区中
-        size = readv(s, v, 3);
+        //size = readv(s, v, 3);
+        size = recvmsg(s, &msg, 0);
         if(size == 0)
             return;
 
-        sprintf(v[0].iov_base, "%d ",size);
+        printf("%s\n", msg.msg_iov->iov_base);
+        sprintf(v[0].iov_base, "%d",size);
         sprintf(v[1].iov_base, "bytes alt");
         sprintf(v[2].iov_base, "ogether\n");
         // 写入字符串长度
         v[0].iov_len = strlen(v[0].iov_base);
         v[1].iov_len = strlen(v[1].iov_base);
-        v[2].iov_len = strlen(v[1].iov_base);
+        v[2].iov_len = strlen(v[2].iov_base);
 
-        writev(s, v, 3);
+        //writev(s, v, 3);
+        sendmsg(s, &msg, 0);
     }
 }
 
